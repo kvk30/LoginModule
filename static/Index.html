@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang ="en">
+    <head>
+        <meta charset = "UTF-8"/>
+        <meta name="viewpoint" content ="width=device-width, intial-scale=1.0"/>
+        <title>Document</title>
+    </head>
+<body> 
+    <h1>
+        Registration
+    </h1>
+    <form id = "Reg-form">
+      <input type = "text" id ="username"placeholder="Username" />
+      <input type = "password" id="password" placeholder="Password" />
+      <input type = "submit" value = "Submit form" />
+    </form>
+    <script>
+        const form = document.getElementById('Reg-form')
+        form.addEventListener('submit', registerUser)
+        async function registerUser(event)
+        {
+            event.preventDefault()
+            const username = document.getElementById('username').nodeValue 
+            const password = document.getElementById('password').nodeValue
+         
+            const result = await fetch('/api/register', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						username,
+						password
+					})
+				}).then((res) => res.json())
+
+            console.log(result)
+        }
+    </script>
+</body>
+</html>
