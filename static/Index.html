@@ -10,7 +10,7 @@
         Registration
     </h1>
     <form id = "Reg-form">
-      <input type = "text" id ="username"placeholder="Username" />
+      <input type = "text" id ="username" placeholder="Username" />
       <input type = "password" id="password" placeholder="Password" />
       <input type = "submit" value = "Submit form" />
     </form>
@@ -20,10 +20,9 @@
         async function registerUser(event)
         {
             event.preventDefault()
-            const username = document.getElementById('username').nodeValue 
-            const password = document.getElementById('password').nodeValue
-         
-            const result = await fetch('/api/register', {
+            const username = document.getElementById('username').value
+            const password = document.getElementById('password').value
+            const result = await fetch('api/register', {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json'
