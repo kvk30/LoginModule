@@ -32,7 +32,14 @@
 						password
 					})
 				}).then((res) => res.json())
+            if(result.status === 'ok')
+            {
 
+            }
+            else
+            {
+                alert(result.error)
+            }
             console.log(result)
         }
     </script>
