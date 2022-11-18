@@ -4,12 +4,35 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const User = require('./model/user')
 const bcrypt = require('bcryptjs')
-
+const jwt = require('jsonwebtoken')
+//very senstive information.
+const JWT_SECRET = 'sdjhfbsdjhvc124132t35t3521#R$!#%!#$%!#$5wdvfsvsfvsfdvsfv'
 mongoose.connect('mongodb://127.0.0.1:27017/login-app-db').then(()=> {console.log('Mongoose connected')}).catch(err => console.log(err))
 //ds
 const app = express()
 app.use('/', express.static(path.join(__dirname,'static')))
 app.use(bodyParser.json())
+
+app.post('/api/login', async(req, res) => {
+const { username, password} = req.body
+
+const user = await User.findOne( {username, password} ).lean()
+if(!user)
+{
+    return res.json({status : 'error', error: 'Invalid username'})
+}
+if(await bcrypt.compare(password, user.password))
+{
+    const token = jwt.sign({ 
+        id: user._id, 
+        username: user.username }, JWT_SECRET)
+    
+    return res.json({status: 'ok', data: ''})
+}
+
+
+res.json({status : 'error', error: 'Invalid username/Password'})
+})
 
 app.post('/api/register', async (req, res) => {
     
