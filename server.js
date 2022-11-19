@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const User = require('./model/user')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+
 //very senstive information.
 const JWT_SECRET = 'sdjhfbsdjhvc124132t35t3521#R$!#%!#$%!#$5wdvfsvsfvsfdvsfv'
 mongoose.connect('mongodb://127.0.0.1:27017/login-app-db').then(()=> {console.log('Mongoose connected')}).catch(err => console.log(err))
@@ -13,13 +14,52 @@ const app = express()
 app.use('/', express.static(path.join(__dirname,'static')))
 app.use(bodyParser.json())
 
+app.post('/api/change-password', async (req, res) =>{
+	const { token, newpassword: plainTextPassword } = req.body
+
+	if (!plainTextPassword || typeof plainTextPassword !== 'string') {
+		return res.json({ status: 'error', error: 'Invalid password' })
+	}
+
+	if (plainTextPassword.length < 5) {
+		return res.json({
+			status: 'error',
+			error: 'Password too small. Should be atleast 6 characters'
+		})
+	}
+
+	try {
+		const user = jwt.verify(token, JWT_SECRET)
+
+		const _id = user.id
+
+		const password = await bcrypt.hash(plainTextPassword, 10)
+
+		await User.updateOne(
+			{ _id },
+			{
+				$set: { password }
+			}
+		)
+		res.json({ status: 'ok' })
+	} catch (error) {
+		console.log(error)
+		res.json({ status: 'error', error: ';))' })
+	}
+}
+
+)
+
 app.post('/api/login', async(req, res) => {
 const { username, password} = req.body
 
-const user = await User.findOne( {username, password} ).lean()
+const user = await User.findOne( {username} ).lean()
 if(!user)
 {
-    return res.json({status : 'error', error: 'Invalid username'})
+    return res.json({
+        status : 'error', 
+        error: 'Invalid username'
+    })
 }
 if(await bcrypt.compare(password, user.password))
 {
@@ -29,8 +69,6 @@ if(await bcrypt.compare(password, user.password))
     
     return res.json({status: 'ok', data: ''})
 }
-
-
 res.json({status : 'error', error: 'Invalid username/Password'})
 })
 
@@ -63,8 +101,7 @@ app.post('/api/register', async (req, res) => {
             return res.json({status: 'error', error: 'Duplicate key'})
         }
         throw error
-        //console.log(JSON.stringify(error))
-       // return res.json({status: 'error'})
+        
     }
 
     res.json({ status : 'ok' })
